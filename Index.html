@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz da Rosalind Franklin</title>
+<style>
+  body {
+    font-family: "Poppins", sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #f8fafc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    text-align: center;
+  }
+  h1 {
+    margin-bottom: 10px;
+  }
+  img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 15px;
+  }
+  .question {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+  }
+  .options button {
+    display: block;
+    width: 100%;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    padding: 12px;
+    margin: 8px 0;
+    color: #f8fafc;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .options button:hover {
+    background: rgba(255,255,255,0.25);
+  }
+  .score {
+    margin-top: 15px;
+    font-weight: bold;
+  }
+  #next-btn {
+    background: #22d3ee;
+    color: #0f172a;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 15px;
+    display: none;
+  }
+  #restart-btn {
+    background: #14b8a6;
+    color: #0f172a;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    display: none;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Quiz da Rosalind Franklin</h1>
+    <img id="image" src="" alt="">
+    <div class="question" id="question">Carregando pergunta...</div>
+    <div class="options" id="options"></div>
+    <button id="next-btn">Próxima</button>
+    <button id="restart-btn">Jogar novamente</button>
+    <div class="score" id="score"></div>
+  </div>
+
+<script>
+const perguntas = [
+  {
+    texto: "Quem foi Rosalind Franklin?",
+    imagem: "https://upload.wikimedia.org/wikipedia/commons/8/8a/Rosalind_Franklin.jpg",
+    opcoes: [
+      "Uma astrônoma britânica famosa",
+      "Uma cientista que estudou a estrutura do DNA",
+      "Uma médica que criou vacinas",
+      "Uma engenheira que trabalhou na NASA"
+    ],
+    correta: 1
+  },
+  {
+    texto: "Qual é o nome da famosa foto tirada por Franklin?",
+    imagem: "https://upload.wikimedia.org/wikipedia/en/7/76/Photo_51_x-ray_diffraction_image.jpg",
+    opcoes: ["Imagem 23", "Foto 51", "Raio-X 7", "Difração 12"],
+    correta: 1
+  },
+  {
+    texto: "Em que área da ciência ela trabalhou?",
+    imagem: "https://upload.wikimedia.org/wikipedia/commons/2/2b/DNA_double_helix_structure_PDB_11.jpg",
+    opcoes: ["Física teórica", "Química e biologia molecular", "Astronomia", "Geologia"],
+    correta: 1
+  },
+  {
+    texto: "Rosalind Franklin recebeu o Prêmio Nobel?",
+    imagem: "https://upload.wikimedia.org/wikipedia/commons/b/bf/Nobel_Prize.png",
+    opcoes: ["Sim", "Não, ela faleceu antes do prêmio ser concedido", "Sim, em 1962", "Recebeu junto com Marie Curie"],
+    correta: 1
+  }
+];
+
+let indice = 0;
+let pontuacao = 0;
+
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const imageEl = document.getElementById("image");
+const nextBtn = document.getElementById("next-btn");
+const restartBtn = document.getElementById("restart-btn");
+const scoreEl = document.getElementById("score");
+
+function mostrarPergunta() {
+  const p = perguntas[indice];
+  questionEl.textContent = p.texto;
+  imageEl.src = p.imagem;
+  optionsEl.innerHTML = "";
+  p.opcoes.forEach((op, i) => {
+    const btn = document.createElement("button");
+    btn.textContent = op;
+    btn.onclick = () => verificarResposta(i);
+    optionsEl.appendChild(btn);
+  });
+  nextBtn.style.display = "none";
+  scoreEl.textContent = `Pergunta ${indice + 1} de ${perguntas.length}`;
+}
+
+function verificarResposta(i) {
+  const p = perguntas[indice];
+  const botoes = optionsEl.querySelectorAll("button");
+  botoes.forEach((btn, index) => {
+    btn.disabled = true;
+    if (index === p.correta) btn.style.background = "#16a34a";
+    else if (index === i) btn.style.background = "#dc2626";
+  });
+
+  if (i === p.correta) pontuacao++;
+
+  nextBtn.style.display = "inline-block";
+}
+
+nextBtn.onclick = () => {
+  indice++;
+  if (indice < perguntas.length) {
+    mostrarPergunta();
+  } else {
+    finalizarQuiz();
+  }
+};
+
+function finalizarQuiz() {
+  imageEl.style.display = "none";
+  questionEl.textContent = `Fim do quiz! Você acertou ${pontuacao} de ${perguntas.length} perguntas.`;
+  optionsEl.innerHTML = "";
+  nextBtn.style.display = "none";
+  restartBtn.style.display = "inline-block";
+  scoreEl.textContent = "";
+}
+
+restartBtn.onclick = () => {
+  indice = 0;
+  pontuacao = 0;
+  imageEl.style.display = "block";
+  restartBtn.style.display = "none";
+  mostrarPergunta();
+};
+
+mostrarPergunta();
+</script>
+</body>
+</html>
